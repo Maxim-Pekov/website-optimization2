@@ -28,12 +28,12 @@ class PostQuerySet(models.QuerySet):
 
 
 class Post(models.Model):
-    objects = PostQuerySet.as_manager()
     title = models.CharField('Заголовок', max_length=200)
     text = models.TextField('Текст')
     slug = models.SlugField('Название в виде url', max_length=200)
     image = models.ImageField('Картинка')
     published_at = models.DateTimeField('Дата и время публикации')
+    objects = PostQuerySet.as_manager()
 
     author = models.ForeignKey(
         User,
@@ -99,6 +99,9 @@ class Tag(models.Model):
 
 
 class Comment(models.Model):
+    text = models.TextField('Текст комментария')
+    published_at = models.DateTimeField('Дата и время публикации')
+
     post = models.ForeignKey(
         'Post',
         on_delete=models.CASCADE,
@@ -109,9 +112,6 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='author_comments',
         verbose_name='Автор')
-
-    text = models.TextField('Текст комментария')
-    published_at = models.DateTimeField('Дата и время публикации')
 
     def __str__(self):
         return f'{self.author.username} under {self.post.title}'
