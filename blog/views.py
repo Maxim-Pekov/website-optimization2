@@ -25,8 +25,14 @@ def serialize_tag(tag):
 
 
 def index(request):
-    most_popular_posts = Post.objects.prefetch_popular_posts_with_comments_count_tags_author()[:5]
-    most_fresh_posts = Post.objects.prefetch_related('author').annotate(comments_count=Count('comments')).prefetch_with_tags().order_by('-published_at')[:5:-1]
+    most_popular_posts = Post.objects.popular_posts() \
+                             .prefetch_related('author') \
+                             .prefetch_with_tags_and_posts_count() \
+                             .fetch_with_comments_count()[:5]
+    most_fresh_posts = Post.objects.prefetch_related('author') \
+                           .annotate(comments_count=Count('comments')) \
+                           .prefetch_with_tags_and_posts_count() \
+                           .order_by('-published_at')[:5:-1]
     most_popular_tags = Tag.objects.popular_tags()[:5]
 
     context = {
@@ -63,7 +69,10 @@ def post_detail(request, slug):
     }
 
     most_popular_tags = Tag.objects.popular_tags()[:5]
-    most_popular_posts = Post.objects.prefetch_popular_posts_with_comments_count_tags_author()[:5]
+    most_popular_posts = Post.objects.popular_posts() \
+                             .prefetch_related('author') \
+                             .prefetch_with_tags_and_posts_count() \
+                             .fetch_with_comments_count()[:5]
 
     context = {
         'post': serialized_post,
@@ -81,8 +90,13 @@ def tag_filter(request, tag_title):
 
     tag = popular_tags.get(title=tag_title)
 
-    related_posts = tag.posts.prefetch_posts_with_comments_count_tags_author()
-    most_popular_posts = Post.objects.prefetch_popular_posts_with_comments_count_tags_author()[:5]
+    related_posts = tag.posts.prefetch_related('author') \
+                       .prefetch_with_tags_and_posts_count() \
+                       .fetch_with_comments_count()
+    most_popular_posts = Post.objects.popular_posts() \
+                             .prefetch_related('author') \
+                             .prefetch_with_tags_and_posts_count() \
+                             .fetch_with_comments_count()[:5]
 
     context = {
         'tag': tag.title,

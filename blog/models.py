@@ -26,12 +26,6 @@ class PostQuerySet(models.QuerySet):
             post.comments_count = count_for_id[post.id]
         return self
 
-    def prefetch_posts_with_comments_count_tags_author(self):
-        return self.prefetch_related('author').prefetch_with_tags_and_posts_count().fetch_with_comments_count()
-
-    def prefetch_popular_posts_with_comments_count_tags_author(self):
-        return self.popular_posts().prefetch_posts_with_comments_count_tags_author()
-
 
 class Post(models.Model):
     objects = PostQuerySet.as_manager()
